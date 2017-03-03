@@ -1,5 +1,6 @@
 package com.example.x3727349s.librogo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         });*/
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menumapa, menu);
         return true;
@@ -39,10 +40,16 @@ public class MainActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == R.id.fotoMenu) {
+            Intent intent = new Intent(this, Foto.class);
+            startActivity(intent);
+
             return true;
+        }else if (id == R.id.mapaMenu){
+            Intent intent = new Intent(this, MainActivityFragment.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
-    }*/
+    }
 }
