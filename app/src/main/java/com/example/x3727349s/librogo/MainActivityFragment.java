@@ -98,9 +98,6 @@ public class MainActivityFragment extends Fragment {
     }
 
 
-
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -117,9 +114,6 @@ public class MainActivityFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-
 
 
 
