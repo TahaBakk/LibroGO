@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Item"
+        android:visible="true"
+        android:enabled="true"
+        android:showAsAction="never|always" />
+    <item android:title="Foto"
+        android:showAsAction="always"
+        android:id="@+id/fotoMenu" />
+    <item android:title="Mapa"
+        android:visible="true"
+        android:showAsAction="always"
+        android:id="@+id/mapaMenu" />
+</menu>
