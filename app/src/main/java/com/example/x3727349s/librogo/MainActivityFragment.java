@@ -91,12 +91,19 @@ public class MainActivityFragment extends Fragment {
         map.getOverlays().add(this.mCompassOverlay);
     }
 
-    @Override//añadimos items al menu
+    /*@Override//añadimos items al menu
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main, menu);
-    }
+        //inflater.inflate(R.menu.menumapa, menu);
+        getActivity().getMenuInflater().inflate(R.menu.menumapa, menu);
 
+    }*/
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflar el menú; Esto agrega elementos a la barra de acción si está presente.
+        getActivity().getMenuInflater().inflate(R.menu.menumapa, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -114,6 +121,24 @@ public class MainActivityFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /*@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menumapa, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }*/
 
 
 

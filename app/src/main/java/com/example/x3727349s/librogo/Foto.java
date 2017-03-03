@@ -20,6 +20,11 @@ public class Foto extends AppCompatActivity {
         setContentView(R.layout.activity_foto);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        dispatchTakePictureIntent();
+    }
 
     String mCurrentPhotoPath;
 
