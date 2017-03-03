@@ -14,6 +14,9 @@ import java.util.Date;
 
 public class Foto extends AppCompatActivity {
 
+
+    private static final int ACTIVITAT_SELECCIONAR_IMATGE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +69,10 @@ public class Foto extends AppCompatActivity {
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
+        //esto es para llamar la galeria bueno para seleccionar opcion si se tiene 2 o mas
+        /*Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, ACTIVITAT_SELECCIONAR_IMATGE);*/
+
     }
 
 
