@@ -1,6 +1,7 @@
 package com.example.x3727349s.librogo;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -14,6 +15,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
@@ -31,6 +35,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -42,7 +48,7 @@ public class MainActivityFragment extends Fragment {
     private CompassOverlay mCompassOverlay;
     private IMapController mapController;
     private static final int ACTIVITAT_SELECCIONAR_IMATGE = 1;
-
+    private StorageReference mStorageRef;
 
 
     public MainActivityFragment() {
@@ -52,7 +58,9 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -175,29 +183,30 @@ public class MainActivityFragment extends Fragment {
         startActivityForResult(i, ACTIVITAT_SELECCIONAR_IMATGE);*/
 
     }
+//FIREBASE:https://console.firebase.google.com/project/librogo-bcc6a/database/data
 
-/*
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getActivity().getMenuInflater().inflate(R.menu.menumapa, menu);
-        return true;
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        switch (requestCode) {
+            case ACTIVITAT_SELECCIONAR_IMATGE:
+                if (resultCode == RESULT_OK) {
+                    Uri seleccio = intent.getData();
+                    String[] columna = {MediaStore.Images.Media.DATA};
+
+                    Cursor cursor = getActivity().getContentResolver().query(
+                            seleccio, columna, null, null, null);
+                    cursor.moveToFirst();
+
+                    int indexColumna = cursor.getColumnIndex(columna[0]);
+                    String rutaFitxer = cursor.getString(indexColumna);
+                    cursor.close();
+                }
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
 
-        int id = item.getItemId();
 
-        if (id == R.id.fotoMenu) {
-            dispatchTakePictureIntent();
-
-            return true;
-        }else if (id == R.id.mapaMenu){
-           /* Intent intent = new Intent(this, MainActivityFragment.class);
-            startActivity(intent);*/
-      /*  }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
 
 }
