@@ -1,6 +1,10 @@
 package com.example.x3727349s.librogo;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -22,6 +26,11 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -32,14 +41,22 @@ public class MainActivityFragment extends Fragment {
     private ScaleBarOverlay mScaleBarOverlay;
     private CompassOverlay mCompassOverlay;
     private IMapController mapController;
+    private static final int ACTIVITAT_SELECCIONAR_IMATGE = 1;
+
 
 
     public MainActivityFragment() {
     }
 
+    @Override//notificamos al activity quer le añadimos items al menu
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
 
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -91,7 +108,7 @@ public class MainActivityFragment extends Fragment {
         map.getOverlays().add(this.mCompassOverlay);
     }
 
-    @Override//añadimos items al menu
+   @Override//añadimos items al menu
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menumapa, menu);
@@ -103,8 +120,7 @@ public class MainActivityFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.fotoMenu) {
-            Intent i = new Intent(getContext(), Foto.class);
-            startActivity(i);
+            dispatchTakePictureIntent();
             return true;
 
         }else if (id == R.id.mapaMenu){
@@ -114,7 +130,74 @@ public class MainActivityFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
+    String mCurrentPhotoPath;
 
+    private File createImageFile() throws IOException {
+        //Se crea el nombre del fitxero
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Guardar un archivo: ruta de acceso con ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
+    }
+
+
+    static final int REQUEST_TAKE_PHOTO = 1;
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                System.out.println("Error al crear la imagen = "+ex);
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+        //esto es para llamar la galeria bueno para seleccionar opcion si se tiene 2 o mas
+        /*Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, ACTIVITAT_SELECCIONAR_IMATGE);*/
+
+    }
+
+/*
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getActivity().getMenuInflater().inflate(R.menu.menumapa, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.fotoMenu) {
+            dispatchTakePictureIntent();
+
+            return true;
+        }else if (id == R.id.mapaMenu){
+           /* Intent intent = new Intent(this, MainActivityFragment.class);
+            startActivity(intent);*/
+      /*  }
+
+        return super.onOptionsItemSelected(item);
+    }*/
 
 
 }

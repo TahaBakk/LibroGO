@@ -27,6 +27,7 @@ public class Foto extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         dispatchTakePictureIntent();
+
     }
 
     String mCurrentPhotoPath;
@@ -74,6 +75,10 @@ public class Foto extends AppCompatActivity {
         startActivityForResult(i, ACTIVITAT_SELECCIONAR_IMATGE);*/
 
     }
+
+
+
+
 
 
 }

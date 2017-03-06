@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         });*/
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menumapa, menu);
         return true;
@@ -41,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.fotoMenu) {
-            Intent intent = new Intent(this, Foto.class);
-            startActivity(intent);
+            MainActivityFragment
 
             return true;
         }else if (id == R.id.mapaMenu){
@@ -51,5 +50,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 }
