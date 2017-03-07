@@ -14,7 +14,7 @@ import java.util.Date;
 
 public class Foto extends AppCompatActivity {
 
-
+//CODIGO INSERVIBLE
     private static final int ACTIVITAT_SELECCIONAR_IMATGE = 1;
 
     @Override
