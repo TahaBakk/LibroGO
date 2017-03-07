@@ -17,7 +17,7 @@ public class LOcalizacionMapa extends MainActivityFragment {
 
     public LatLng getLocation()
     {
-        // Coje la localizacion
+        //Coje la localizacion
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, false);
