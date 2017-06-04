@@ -2,6 +2,9 @@ package com.example.x3727349s.librogo;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -16,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -36,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.LOCATION_SERVICE;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -159,51 +164,90 @@ public class MainActivityFragment extends Fragment {
 
 
     static final int REQUEST_TAKE_PHOTO = 1;
-
+    //Hacer foto y pillar ruta
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            // Create the File where the photo should go
+
             File photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 System.out.println("Error al crear la imagen = "+ex);
             }
-            // Continue only if the File was successfully created
+
             if (photoFile != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         Uri.fromFile(photoFile));
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
-        //esto es para llamar la galeria bueno para seleccionar opcion si se tiene 2 o mas
+        getLocation();
+    }
+    //GPS
+    public LatLng getLocation()
+    {
+        //Coje la localizacion
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(bestProvider);
+        Double lat,lon;
+        try {
+            lat = location.getLatitude ();
+            lon = location.getLongitude ();
+            Pojo.setLongitude(lon);
+            Pojo.setLatitude(lat);
+            System.out.println("DEBUG****-->LAT ==>"+lat+" LON ==> "+lon);
+
+            return new LatLng(lat, lon);
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //esto es para llamar la galeria bueno para seleccionar opcion si se tiene 2 o mas
         /*Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, ACTIVITAT_SELECCIONAR_IMATGE);*/
 
-    }
+
+
+
+
 //FIREBASE:https://console.firebase.google.com/project/librogo-bcc6a/database/data
 
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+   /* public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        switch (requestCode) {
-            case ACTIVITAT_SELECCIONAR_IMATGE:
-                if (resultCode == RESULT_OK) {
-                    Uri seleccio = intent.getData();
-                    String[] columna = {MediaStore.Images.Media.DATA};
+        if (requestCode == REQUEST_TAKE_PHOTO) {
+            if (resultCode == RESULT_OK) {
+                Uri seleccio = intent.getData();
+                String[] columna = {MediaStore.Images.Media.DATA};
 
-                    Cursor cursor = getActivity().getContentResolver().query(
-                            seleccio, columna, null, null, null);
-                    cursor.moveToFirst();
+                Cursor cursor = getActivity().getContentResolver().query(
+                        seleccio, columna, null, null, null);
+                cursor.moveToFirst();
 
-                    int indexColumna = cursor.getColumnIndex(columna[0]);
-                    String rutaFitxer = cursor.getString(indexColumna);
-                    cursor.close();
-                }
+                int indexColumna = cursor.getColumnIndex(columna[0]);
+                String rutaFitxer = cursor.getString(indexColumna);
+                cursor.close();
+            }
         }
-    }
+    }*/
 
 
 

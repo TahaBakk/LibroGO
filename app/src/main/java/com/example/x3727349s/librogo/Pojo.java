@@ -6,18 +6,18 @@ package com.example.x3727349s.librogo;
 
 public class Pojo {
 
-    public double longitude;
-    public double latitude;
-    public String rutaFoto;
+    private static double longitude;
+    private static double latitude;
+    private static String rutaFoto;
 
 
     public double getLongitude() {return longitude;}
     public double getLatitude() {return latitude;}
     public String getRutaFoto() {return rutaFoto;}
 
-    public void setLongitude(double longitude) {this.longitude = longitude;}
-    public void setLatitude(double latitude) {this.latitude = latitude;}
-    public void setRutaFoto(String rutaFoto) {this.rutaFoto = rutaFoto;}
+    public static void setLongitude(double lon) {longitude = lon;}
+    public static void setLatitude(double lat) {latitude = lat;}
+    public static void setRutaFoto(String path) {rutaFoto = path;}
 
     @Override
     public String toString() {
