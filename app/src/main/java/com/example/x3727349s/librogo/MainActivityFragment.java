@@ -58,7 +58,6 @@ public class MainActivityFragment extends Fragment {
     private CompassOverlay mCompassOverlay;
     private IMapController mapController;
     private static final int ACTIVITAT_SELECCIONAR_IMATGE = 1;
-    //private StorageReference mStorageRef;
     private DatabaseReference dbRef;
     private static double longitude;
     private static double latitude;
@@ -75,7 +74,6 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        //mStorageRef = FirebaseStorage.getInstance().getReference();
         dbRef = FirebaseDatabase.getInstance().getReference().child("Photo");
     }
 
@@ -156,12 +154,9 @@ public class MainActivityFragment extends Fragment {
                     double loni = Double.parseDouble(latSin);
 
                     Pojo pj = new Pojo(loni, lati, pathFoto[1]);
-                    //Pojo pj = snapshot.getValue(Pojo.class);//loc
-                    System.out.println("vaaaaaaaaaaaaa"+ pj.toString());
                     pos.add(pj);//locationsList
 
                     Marker marker = new Marker(map);
-
                     GeoPoint point = new GeoPoint(
                             pj.getLatitude(),
                             pj.getLongitude()
@@ -236,9 +231,7 @@ public class MainActivityFragment extends Fragment {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-        // Guardar un archivo: ruta de acceso con ACTION_VIEW intents
         mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        //Pojo.setRutaFoto(image.getAbsolutePath());
         rutaFoto = image.getAbsolutePath();
         return image;
     }
@@ -279,15 +272,12 @@ public class MainActivityFragment extends Fragment {
         try {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
-            //Pojo.setLongitude(location.getLongitude());
-            //Pojo.setLatitude(location.getLatitude());
+
             System.out.println("DEBUG****-->LAT ==>"+location.getLongitude()+" LON ==> "+location.getLatitude());
             
-            //return new LatLng(location.getLatitude(), location.getLongitude());
         }
         catch (NullPointerException e){
             e.printStackTrace();
-           // return null;
         }
     }
 
@@ -297,7 +287,6 @@ public class MainActivityFragment extends Fragment {
         dbRef.push().setValue(pojo);
 
     }
-
 
     //esto es para llamar la galeria bueno para seleccionar opcion si se tiene 2 o mas
         /*Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
