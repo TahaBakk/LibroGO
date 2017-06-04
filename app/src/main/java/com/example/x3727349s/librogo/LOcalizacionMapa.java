@@ -15,7 +15,7 @@ import static android.content.Context.LOCATION_SERVICE;
 
 public class LOcalizacionMapa extends MainActivityFragment {
 
-    public LatLng getLocation()
+    /*public LatLng getLocation()
     {
         //Coje la localizacion
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
@@ -33,6 +33,6 @@ public class LOcalizacionMapa extends MainActivityFragment {
             e.printStackTrace();
             return null;
         }
-    }
+    }*/
 
 }

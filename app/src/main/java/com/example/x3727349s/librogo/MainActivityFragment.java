@@ -1,6 +1,9 @@
 package com.example.x3727349s.librogo;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -11,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,13 +21,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import org.osmdroid.bonuspack.overlays.Marker;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
@@ -38,6 +42,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -58,6 +63,8 @@ public class MainActivityFragment extends Fragment {
     private static double longitude;
     private static double latitude;
     private static String rutaFoto;
+    private ArrayList<Pojo> pos = new ArrayList<>();
+    private RadiusMarkerClusterer markers;
 
 
 
@@ -84,7 +91,7 @@ public class MainActivityFragment extends Fragment {
         initializeMap();
         setZoom();
         setOverlays();
-
+        putMarkers();
 
 
 
@@ -127,6 +134,71 @@ public class MainActivityFragment extends Fragment {
         map.getOverlays().add(this.mCompassOverlay);
     }
 
+
+    public void putMarkers(){
+
+        pos.clear();
+        setupMarkerOverlay();
+
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String datosSnap = snapshot.getValue().toString();
+
+                    String[] parts = datosSnap.split(",");
+                    String[] pathFoto = parts[0].split("=");
+                    String[] lon = parts[1].split("=");
+                    String[] lat = parts[2].split("=");//quitarle el ultimo caracter
+                    //casteamos
+                    String latSin = lat[1].substring(0, lat[1].length()-1);
+                    double lati = Double.parseDouble(lon[1]);
+                    double loni = Double.parseDouble(latSin);
+
+                    Pojo pj = new Pojo(loni, lati, pathFoto[1]);
+                    //Pojo pj = snapshot.getValue(Pojo.class);//loc
+                    System.out.println("vaaaaaaaaaaaaa"+ pj.toString());
+                    pos.add(pj);//locationsList
+
+                    Marker marker = new Marker(map);
+
+                    GeoPoint point = new GeoPoint(
+                            pj.getLatitude(),
+                            pj.getLongitude()
+                    );
+                    marker.setPosition(point);
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    marker.setIcon(getResources().getDrawable(R.drawable.iconlibro));
+                    marker.setTitle(pj.getRutaFoto());
+                    marker.setAlpha(0.6f);
+                    System.out.println("Vaaaaaaaaaaaaaa?"+ pj.getLatitude() );
+                    markers.add(marker);
+                }
+                markers.invalidate();
+                map.invalidate();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void setupMarkerOverlay() {
+        markers = new RadiusMarkerClusterer(getContext());
+        map.getOverlays().add(markers);
+
+        Drawable clusterIconD = getResources().getDrawable(R.drawable.iconlibro);
+        Bitmap clusterIcon = ((BitmapDrawable) clusterIconD).getBitmap();
+
+        markers.setIcon(clusterIcon);
+        markers.setRadius(100);
+
+    }
+
+
    @Override//añadimos items al menu
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -140,11 +212,13 @@ public class MainActivityFragment extends Fragment {
 
         if (id == R.id.fotoMenu) {
             dispatchTakePictureIntent();
+            putMarkers();
             return true;
 
         }else if (id == R.id.mapaMenu){
             Intent i = new Intent(getContext(), MainActivityFragment.class);
             startActivity(i);
+            putMarkers();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -194,7 +268,7 @@ public class MainActivityFragment extends Fragment {
 
     }
     //GPS
-    public LatLng getLocation()
+    public void getLocation()
     {
         //Coje la localizacion
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
@@ -209,11 +283,11 @@ public class MainActivityFragment extends Fragment {
             //Pojo.setLatitude(location.getLatitude());
             System.out.println("DEBUG****-->LAT ==>"+location.getLongitude()+" LON ==> "+location.getLatitude());
             
-            return new LatLng(location.getLatitude(), location.getLongitude());
+            //return new LatLng(location.getLatitude(), location.getLongitude());
         }
         catch (NullPointerException e){
             e.printStackTrace();
-            return null;
+           // return null;
         }
     }
 
@@ -222,24 +296,7 @@ public class MainActivityFragment extends Fragment {
         Pojo pojo = new Pojo(longitude, latitude, rutaFoto);
         dbRef.push().setValue(pojo);
 
-        //System.out.println( "GET!!!!!!" + Pojo.getLatitude() + "--"+ Pojo.getLongitude() + "--"+ Pojo.getRutaFoto());
-       // bajarDatosFirebase();
     }
-
-    /*public void bajarDatosFirebase(){
-        dbRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //Pojo pojo = dataSnapshot.getValue(Pojo.class);
-                Log.i("FIREBASE===>", dataSnapshot.toString());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }*/
 
 
     //esto es para llamar la galeria bueno para seleccionar opcion si se tiene 2 o mas
