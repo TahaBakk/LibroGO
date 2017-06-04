@@ -1,7 +1,6 @@
 package com.example.x3727349s.librogo;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -12,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,26 +20,26 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LOCATION_SERVICE;
 
 /**
@@ -53,7 +53,12 @@ public class MainActivityFragment extends Fragment {
     private CompassOverlay mCompassOverlay;
     private IMapController mapController;
     private static final int ACTIVITAT_SELECCIONAR_IMATGE = 1;
-    private StorageReference mStorageRef;
+    //private StorageReference mStorageRef;
+    private DatabaseReference dbRef;
+    private static double longitude;
+    private static double latitude;
+    private static String rutaFoto;
+
 
 
     public MainActivityFragment() {
@@ -63,7 +68,8 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+        //mStorageRef = FirebaseStorage.getInstance().getReference();
+        dbRef = FirebaseDatabase.getInstance().getReference().child("Photo");
     }
 
     @Override
@@ -156,9 +162,10 @@ public class MainActivityFragment extends Fragment {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
         // Guardar un archivo: ruta de acceso con ACTION_VIEW intents
         mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        //Pojo.setRutaFoto(image.getAbsolutePath());
+        rutaFoto = image.getAbsolutePath();
         return image;
     }
 
@@ -183,6 +190,8 @@ public class MainActivityFragment extends Fragment {
             }
         }
         getLocation();
+        subirDatosFirebase();
+
     }
     //GPS
     public LatLng getLocation()
@@ -194,13 +203,13 @@ public class MainActivityFragment extends Fragment {
         Location location = locationManager.getLastKnownLocation(bestProvider);
         Double lat,lon;
         try {
-            lat = location.getLatitude ();
-            lon = location.getLongitude ();
-            Pojo.setLongitude(lon);
-            Pojo.setLatitude(lat);
-            System.out.println("DEBUG****-->LAT ==>"+lat+" LON ==> "+lon);
-
-            return new LatLng(lat, lon);
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            //Pojo.setLongitude(location.getLongitude());
+            //Pojo.setLatitude(location.getLatitude());
+            System.out.println("DEBUG****-->LAT ==>"+location.getLongitude()+" LON ==> "+location.getLatitude());
+            
+            return new LatLng(location.getLatitude(), location.getLongitude());
         }
         catch (NullPointerException e){
             e.printStackTrace();
@@ -208,49 +217,34 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+    public void subirDatosFirebase(){
 
+        Pojo pojo = new Pojo(longitude, latitude, rutaFoto);
+        dbRef.push().setValue(pojo);
 
+        //System.out.println( "GET!!!!!!" + Pojo.getLatitude() + "--"+ Pojo.getLongitude() + "--"+ Pojo.getRutaFoto());
+       // bajarDatosFirebase();
+    }
 
+    /*public void bajarDatosFirebase(){
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //Pojo pojo = dataSnapshot.getValue(Pojo.class);
+                Log.i("FIREBASE===>", dataSnapshot.toString());
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-
-
-
-
-
+            }
+        });
+    }*/
 
 
     //esto es para llamar la galeria bueno para seleccionar opcion si se tiene 2 o mas
         /*Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, ACTIVITAT_SELECCIONAR_IMATGE);*/
-
-
-
-
-
-//FIREBASE:https://console.firebase.google.com/project/librogo-bcc6a/database/data
-
-   /* public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-
-        if (requestCode == REQUEST_TAKE_PHOTO) {
-            if (resultCode == RESULT_OK) {
-                Uri seleccio = intent.getData();
-                String[] columna = {MediaStore.Images.Media.DATA};
-
-                Cursor cursor = getActivity().getContentResolver().query(
-                        seleccio, columna, null, null, null);
-                cursor.moveToFirst();
-
-                int indexColumna = cursor.getColumnIndex(columna[0]);
-                String rutaFitxer = cursor.getString(indexColumna);
-                cursor.close();
-            }
-        }
-    }*/
-
-
-
 
 
 }
