@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -130,6 +131,9 @@ public class MainActivityFragment extends Fragment {
         map.getOverlays().add(myLocationOverlay);
         map.getOverlays().add(this.mScaleBarOverlay);
         map.getOverlays().add(this.mCompassOverlay);
+
+
+
     }
 
 
@@ -163,11 +167,11 @@ public class MainActivityFragment extends Fragment {
                     );
                     marker.setPosition(point);
                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    marker.setIcon(getResources().getDrawable(R.drawable.iconlibro));
+                    marker.setIcon(getResources().getDrawable(R.drawable.icono_libro));
                     marker.setTitle(pj.getRutaFoto());
                     marker.setAlpha(0.6f);
-                    System.out.println("Vaaaaaaaaaaaaaa?"+ pj.getLatitude() );
                     markers.add(marker);
+
                 }
                 markers.invalidate();
                 map.invalidate();
@@ -185,7 +189,7 @@ public class MainActivityFragment extends Fragment {
         markers = new RadiusMarkerClusterer(getContext());
         map.getOverlays().add(markers);
 
-        Drawable clusterIconD = getResources().getDrawable(R.drawable.iconlibro);
+        Drawable clusterIconD = getResources().getDrawable(R.drawable.icono_libro);
         Bitmap clusterIcon = ((BitmapDrawable) clusterIconD).getBitmap();
 
         markers.setIcon(clusterIcon);
@@ -210,10 +214,12 @@ public class MainActivityFragment extends Fragment {
             putMarkers();
             return true;
 
-        }else if (id == R.id.mapaMenu){
-            Intent i = new Intent(getContext(), MainActivityFragment.class);
-            startActivity(i);
-            putMarkers();
+        }else if (id == R.id.Video){
+            try {
+                dispatchTakeVideoIntent();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -287,6 +293,44 @@ public class MainActivityFragment extends Fragment {
         dbRef.push().setValue(pojo);
 
     }
+
+    //VIDEO
+    private File createVideoFile(int requestTakeVideo) throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "MP4_" + timeStamp;
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_MOVIES);
+        File video = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".mp4",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + video.getAbsolutePath();
+        return video;
+    }
+
+    //Video
+    static final int REQUEST_TAKE_VIDEO = 2;
+    private void dispatchTakeVideoIntent() throws IOException {
+
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (takeVideoIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            File videoFile = null;
+            videoFile = createVideoFile(REQUEST_TAKE_VIDEO);
+
+            if (videoFile != null) {
+                takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(videoFile));
+                startActivityForResult(takeVideoIntent, REQUEST_TAKE_VIDEO);
+            }
+        }
+    }
+
+
+
 
     //esto es para llamar la galeria bueno para seleccionar opcion si se tiene 2 o mas
         /*Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);

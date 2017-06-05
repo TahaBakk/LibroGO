@@ -4,9 +4,7 @@
     <item android:title="Foto"
         android:showAsAction="never|always"
         android:id="@+id/fotoMenu" />
-    <item android:title="Mapa"
-        android:visible="true"
+    <item android:title="Video"
         android:showAsAction="never|always"
-        android:id="@+id/mapaMenu"
-        android:enabled="true" />
+        android:id="@+id/Video" />
 </menu>
