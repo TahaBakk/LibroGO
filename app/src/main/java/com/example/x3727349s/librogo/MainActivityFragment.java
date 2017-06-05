@@ -158,8 +158,8 @@ public class MainActivityFragment extends Fragment {
 
                     Marker marker = new Marker(map);
                     GeoPoint point = new GeoPoint(
-                            pj.getLatitude(),
-                            pj.getLongitude()
+                           pj.getLongitude(),
+                           pj.getLatitude()
                     );
                     marker.setPosition(point);
                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
